@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keyboard Tester</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    isolation: isolate;
+    min-height: 100vh;
+    margin: 0;
+    padding: 42px 24px 64px;
+    overflow-x: hidden;
+    background-color: #111;
+    background-image:
+        linear-gradient(rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.48)),
+        url("one-piece-background.jpg");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    color: #f7f3f1;
+    font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    text-align: center;
+}
+
+body::before,
+body::after {
+    display: none;
+    position: fixed;
+    z-index: -1;
+    pointer-events: none;
+    content: "";
+}
+
+body::before {
+    inset: 0;
+    opacity: 0.24;
+    background: repeating-conic-gradient(from 245deg at 78% 15%, transparent 0deg 8deg, rgba(0, 0, 0, 0.9) 8.5deg 9deg);
+    animation: sunburst 36s linear infinite;
+}
+
+body::after {
+    width: 190px;
+    height: 190px;
+    top: 38px;
+    right: 13%;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 38%, #fff, #d5d5d5 65%, rgba(0, 0, 0, 0.08) 72%);
+    box-shadow: 0 0 70px rgba(255, 255, 255, 0.5);
+    opacity: 0.75;
+}
+
+@keyframes sunburst {
+    to { transform: rotate(18deg) scale(1.08); }
+}
+
+.scene {
+    display: none;
+    position: fixed;
+    z-index: -1;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.scene::before,
+.scene::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+    pointer-events: none;
+}
+
+.scene::before {
+    background:
+        repeating-linear-gradient(90deg, transparent 0 31vw, rgba(0, 0, 0, 0.48) 31.1vw 31.35vw, transparent 31.45vw 62vw),
+        repeating-linear-gradient(0deg, transparent 0 24vh, rgba(0, 0, 0, 0.44) 24.1vh 24.35vh, transparent 24.45vh 48vh);
+    opacity: 0.42;
+}
+
+.scene::after {
+    background-image: radial-gradient(rgba(0, 0, 0, 0.58) 0.8px, transparent 1px);
+    background-size: 6px 6px;
+    opacity: 0.16;
+    mix-blend-mode: multiply;
+}
+
+.ocean {
+    position: absolute;
+    inset: 65% 0 0;
+    background: linear-gradient(180deg, #777, #343434 55%, #111);
+}
+
+.ocean::before,
+.ocean::after {
+    position: absolute;
+    inset: 0;
+    content: "";
+}
+
+.ocean::before {
+    background: repeating-linear-gradient(174deg, transparent 0 22px, rgba(255, 255, 255, 0.35) 23px 25px, transparent 26px 48px);
+    animation: current 8s ease-in-out infinite alternate;
+}
+
+.ocean::after {
+    top: -8px;
+    height: 20px;
+    background: repeating-radial-gradient(ellipse at 50% 100%, rgba(255, 255, 255, 0.42) 0 2px, transparent 3px 40px);
+    animation: current 5s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes current {
+    from { transform: translateX(-18px); }
+    to { transform: translateX(18px); }
+}
+
+.cloud {
+    position: absolute;
+    width: 130px;
+    height: 34px;
+    border-radius: 50px;
+    background: rgba(250, 250, 250, 0.82);
+    filter: drop-shadow(0 8px 10px rgba(36, 103, 121, 0.12));
+    animation: cloud-drift 28s ease-in-out infinite alternate;
+}
+
+.cloud::before,
+.cloud::after {
+    position: absolute;
+    bottom: 8px;
+    border-radius: 50%;
+    background: inherit;
+    content: "";
+}
+
+.cloud::before { left: 22px; width: 48px; height: 48px; }
+.cloud::after { right: 18px; width: 38px; height: 38px; }
+.cloud-one { top: 22%; left: 9%; }
+.cloud-two { top: 39%; right: 6%; transform: scale(0.7); animation-delay: -11s; }
+
+@keyframes cloud-drift {
+    to { translate: 40px 8px; }
+}
+
+.ship {
+    position: absolute;
+    left: 49%;
+    bottom: 23%;
+    width: 150px;
+    height: 122px;
+    animation: ship-rock 4s ease-in-out infinite alternate;
+}
+
+.ship-hull {
+    position: absolute;
+    bottom: 0;
+    left: 7px;
+    width: 136px;
+    height: 31px;
+    clip-path: polygon(0 0, 100% 0, 82% 100%, 18% 100%);
+    background: #252525;
+    border-top: 5px solid #eee;
+}
+
+.ship-mast {
+    position: absolute;
+    bottom: 24px;
+    left: 73px;
+    width: 6px;
+    height: 96px;
+    background: #333;
+}
+
+.ship-sail {
+    position: absolute;
+    top: 11px;
+    left: 24px;
+    width: 48px;
+    height: 68px;
+    clip-path: polygon(100% 0, 100% 100%, 0 78%);
+    background: #f3f3f3;
+    border-right: 3px solid #111;
+}
+
+.ship-sail-small {
+    position: absolute;
+    top: 29px;
+    left: 82px;
+    width: 42px;
+    height: 52px;
+    clip-path: polygon(0 0, 100% 85%, 0 100%);
+    background: #555;
+}
+
+@keyframes ship-rock {
+    from { translate: 0 0; rotate: -1deg; }
+    to { translate: 0 -7px; rotate: 1deg; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+section {
+    max-width: 1360px;
+    margin: 0 auto;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+}
+
+h2 {
+    margin: 0 0 8px;
+    color: #fff;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 28px;
+    font-weight: 500;
+}
+
+.intro {
+    margin: 0;
+    color: #b9c6d2;
+    font-size: 14px;
+}
+
+/* =========================
+   KEYBOARD TESTER
+========================= */
+
+.keyboard-stage {
+    padding-top: 124px;
+}
+
+.keyboard-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 0;
+    padding-bottom: 10px;
+}
+
+.keyboard {
+    width: max-content;
+    min-width: 1252px;
+    margin: auto;
+    padding: 8px 13px 72px;
+    background: linear-gradient(145deg, rgba(25, 25, 25, 0.62), rgba(8, 8, 8, 0.62));
+    border: 1px solid #888;
+    border-radius: 10px;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+.keyboard-heading {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #555;
+    text-align: center;
+}
+
+.keyboard-heading h2 {
+    margin: 0 0 5px;
+    color: #fff;
+    font-family: Impact, "Arial Black", sans-serif;
+    font-size: 27px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.keyboard-heading .intro {
+    color: #eee;
+    font-family: "Comic Sans MS", "Segoe Print", cursive;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.keyboard-row {
+    display: flex;
+    gap: 7px;
+    margin-bottom: 10px;
+    justify-content: flex-start;
+}
+
+.keyboard > .keyboard-row {
+    width: calc(100% - 27px);
+    margin: 0 auto 10px;
+    justify-content: space-between;
+}
+
+.keyboard > .keyboard-row .key:nth-child(6),
+.keyboard > .keyboard-row .key:nth-child(10),
+.keyboard > .keyboard-row .key:nth-child(14),
+.keyboard > .keyboard-row .key:nth-child(17) {
+    margin-left: 8px;
+}
+
+.keyboard > .keyboard-row .key {
+    height: 50px;
+}
+
+.keyboard-body {
+    display: grid;
+    grid-template-columns: max-content 242px;
+    gap: 22px;
+    justify-content: center;
+    width: max-content;
+    margin: 0 auto;
+}
+
+.keyboard-main {
+    width: max-content;
+    min-width: 0;
+}
+
+.keyboard-side {
+    position: relative;
+    display: block;
+    width: 242px;
+}
+
+.key {
+    position: relative;
+    flex: 0 0 53px;
+    height: 50px;
+    min-width: 53px;
+    padding: 0 8px;
+    background: linear-gradient(145deg, rgba(69, 69, 69, 0.72), rgba(34, 34, 34, 0.72) 72%);
+    border: 1px solid #777;
+    border-radius: 5px 5px 7px 7px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #f2f2f2;
+    font-size: 15px;
+    font-weight: bold;
+
+    box-sizing: border-box;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+
+    transition:
+        background 0.12s,
+        transform 0.08s;
+    box-shadow: none;
+}
+
+.key.tested:not(.active) {
+    background: linear-gradient(145deg, rgba(119, 119, 119, 0.7), rgba(85, 85, 85, 0.7) 72%);
+    border-color: #aaa;
+}
+
+/* When a physical keyboard key is pressed */
+.key.active {
+    background: rgba(255, 255, 255, 0.88);
+    color: #111;
+    border-color: #fff;
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+/* Clicked visual key */
+.key.clicked {
+    background: rgba(204, 204, 204, 0.82);
+    color: #111;
+    border-color: #fff;
+}
+
+.key:focus-visible,
+button:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 3px;
+}
+
+/* Different key widths */
+
+.key-esc {
+    min-width: 60px;
+}
+
+.key-backspace {
+    min-width: 90px;
+    margin-right: -4px;
+    left: -2px;
+}
+
+.key-backslash {
+    min-width: 61px;
+}
+
+.key-tab {
+    min-width: 80px;
+}
+
+.key-caps {
+    min-width: 93px;
+}
+
+.key-enter {
+    min-width: 108px;
+}
+
+.key-shift-left {
+    min-width: 119px;
+}
+
+.key-shift-right {
+    min-width: 142px;
+}
+
+.key-ctrl {
+    min-width: 68px;
+}
+
+.key-space {
+    flex: 0 0 343px;
+    min-width: 343px;
+}
+
+.key-alt {
+    min-width: 68px;
+}
+
+.key-win {
+    min-width: 68px;
+}
+
+.key-menu {
+    min-width: 68px;
+}
+
+.key-small {
+    min-width: 63px;
+}
+
+.key-nav {
+    min-width: 58px;
+}
+
+.key-arrow-up {
+    min-width: 54px;
+    margin-left: 7px;
+}
+
+.keyboard-main [data-key="PageUp"] { left: 9px; }
+.keyboard-main [data-key="PageDown"] { left: 8px; }
+.keyboard-main [data-key="Insert"] { left: 7px; }
+.keyboard-main [data-key="Delete"] { left: 8px; }
+
+.key-wide {
+    min-width: 75px;
+}
+
+.key-cluster {
+    display: grid;
+    gap: 10px;
+}
+
+.navigation-cluster {
+    position: absolute;
+    right: calc(100% - 42px);
+    bottom: -60px;
+    width: 182px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.numpad-cluster {
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.keyboard-side .key {
+    min-width: 0;
+    width: 100%;
+}
+
+.keyboard-side .key-tall {
+    grid-row: span 2;
+    height: auto;
+}
+
+.keyboard-side .key-double {
+    grid-column: span 2;
+}
+
+.keyboard-main > .keyboard-row:last-child {
+    margin-bottom: 0;
+}
+
+.key-spacer {
+    visibility: hidden;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding: 28px 10px 42px;
+        background-attachment: scroll;
+    }
+
+    body::after {
+        width: 120px;
+        height: 120px;
+        right: -28px;
+        top: 28px;
+        opacity: 0.45;
+    }
+
+    .ship {
+        left: 37%;
+        bottom: 20%;
+        transform: scale(0.72);
+        transform-origin: bottom center;
+    }
+
+    section {
+        padding: 22px 12px;
+    }
+
+}
+
+/* Keyboard information */
+
+.keyboard-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    text-align: left;
+}
+
+.status-copy {
+    min-width: 0;
+}
+
+.status-copy strong {
+    color: #c5d0da;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 7px;
+}
+
+#lastKey {
+    color: #f1f1f1;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+#heldKeys {
+    color: #9eadbb;
+    margin-top: 5px;
+    min-height: 20px;
+    font-size: 12px;
+}
+
+.status-actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+}
+
+#testedCount {
+    color: #d9e3e9;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+button {
+    padding: 8px 12px;
+    border: 1px solid #888;
+    border-radius: 5px;
+    background: #222;
+    color: #fff;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #444;
+}
+
+@media (max-width: 520px) {
+    .keyboard-info {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .status-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="scene" aria-hidden="true">
+    <span class="cloud cloud-one"></span>
+    <span class="cloud cloud-two"></span>
+    <div class="ship">
+        <span class="ship-mast"></span>
+        <span class="ship-sail"></span>
+        <span class="ship-sail-small"></span>
+        <span class="ship-hull"></span>
+    </div>
+    <div class="ocean"></div>
+</div>
+
+<!-- =========================
+     KEYBOARD TESTER
+========================= -->
+
+<section>
+
+<div class="keyboard-stage">
+
+<div class="keyboard-heading">
+    <h2>Keyboard Tester</h2>
+    <p class="intro">Press or hold any key. It will light up here while you test it.</p>
+</div>
+
+<div class="keyboard-container">
+
+<div class="keyboard">
+
+<!-- Function Row -->
+<div class="keyboard-row">
+
+<div class="key key-esc" data-key="Escape">Esc</div>
+
+<div class="key" data-key="F1">F1</div>
+<div class="key" data-key="F2">F2</div>
+<div class="key" data-key="F3">F3</div>
+<div class="key" data-key="F4">F4</div>
+
+<div class="key" data-key="F5">F5</div>
+<div class="key" data-key="F6">F6</div>
+<div class="key" data-key="F7">F7</div>
+<div class="key" data-key="F8">F8</div>
+
+<div class="key" data-key="F9">F9</div>
+<div class="key" data-key="F10">F10</div>
+<div class="key" data-key="F11">F11</div>
+<div class="key" data-key="F12">F12</div>
+
+<div class="key key-small" data-key="PrintScreen">PrtSc</div>
+<div class="key key-small" data-key="ScrollLock">ScrLk</div>
+<div class="key key-small" data-key="Pause">Pause</div>
+<div class="key key-small" data-key="Home">Home</div>
+<div class="key key-small" data-key="End">End</div>
+
+</div>
+
+<div class="keyboard-body">
+<div class="keyboard-main">
+
+<!-- Number Row -->
+<div class="keyboard-row">
+
+<div class="key" data-key="Backquote">~</div>
+<div class="key" data-key="Digit1">1</div>
+<div class="key" data-key="Digit2">2</div>
+<div class="key" data-key="Digit3">3</div>
+<div class="key" data-key="Digit4">4</div>
+<div class="key" data-key="Digit5">5</div>
+<div class="key" data-key="Digit6">6</div>
+<div class="key" data-key="Digit7">7</div>
+<div class="key" data-key="Digit8">8</div>
+<div class="key" data-key="Digit9">9</div>
+<div class="key" data-key="Digit0">0</div>
+<div class="key" data-key="Minus">-</div>
+<div class="key" data-key="Equal">=</div>
+
+<div class="key key-backspace" data-key="Backspace">
+    Backspace
+</div>
+<div class="key key-nav" data-key="PageUp">PgUp</div>
+
+</div>
+
+<!-- QWERTY Row -->
+<div class="keyboard-row">
+
+<div class="key key-tab" data-key="Tab">Tab</div>
+
+<div class="key" data-key="KeyQ">Q</div>
+<div class="key" data-key="KeyW">W</div>
+<div class="key" data-key="KeyE">E</div>
+<div class="key" data-key="KeyR">R</div>
+<div class="key" data-key="KeyT">T</div>
+<div class="key" data-key="KeyY">Y</div>
+<div class="key" data-key="KeyU">U</div>
+<div class="key" data-key="KeyI">I</div>
+<div class="key" data-key="KeyO">O</div>
+<div class="key" data-key="KeyP">P</div>
+<div class="key" data-key="BracketLeft">[</div>
+<div class="key" data-key="BracketRight">]</div>
+<div class="key key-backslash" data-key="Backslash">\</div>
+<div class="key key-nav" data-key="PageDown">PgDn</div>
+
+</div>
+
+<!-- Home Row -->
+<div class="keyboard-row">
+
+<div class="key key-caps" data-key="CapsLock">
+    Caps Lock
+</div>
+
+<div class="key" data-key="KeyA">A</div>
+<div class="key" data-key="KeyS">S</div>
+<div class="key" data-key="KeyD">D</div>
+<div class="key" data-key="KeyF">F</div>
+<div class="key" data-key="KeyG">G</div>
+<div class="key" data-key="KeyH">H</div>
+<div class="key" data-key="KeyJ">J</div>
+<div class="key" data-key="KeyK">K</div>
+<div class="key" data-key="KeyL">L</div>
+<div class="key" data-key="Semicolon">;</div>
+<div class="key" data-key="Quote">'</div>
+
+<div class="key key-enter" data-key="Enter">
+    Enter
+</div>
+<div class="key key-nav" data-key="Insert">Ins</div>
+
+</div>
+
+<!-- Shift Row -->
+<div class="keyboard-row">
+
+<div class="key key-shift-left" data-key="ShiftLeft">
+    Shift
+</div>
+
+<div class="key" data-key="KeyZ">Z</div>
+<div class="key" data-key="KeyX">X</div>
+<div class="key" data-key="KeyC">C</div>
+<div class="key" data-key="KeyV">V</div>
+<div class="key" data-key="KeyB">B</div>
+<div class="key" data-key="KeyN">N</div>
+<div class="key" data-key="KeyM">M</div>
+<div class="key" data-key="Comma">,</div>
+<div class="key" data-key="Period">.</div>
+<div class="key" data-key="Slash">/</div>
+
+<div class="key key-shift-right" data-key="ShiftRight">
+    Shift
+</div>
+<div class="key key-nav" data-key="Delete">Del</div>
+
+</div>
+
+<!-- Bottom Row -->
+<div class="keyboard-row">
+
+<div class="key key-ctrl" data-key="ControlLeft">
+    Ctrl
+</div>
+
+<div class="key key-win" data-key="MetaLeft">
+    Win
+</div>
+
+<div class="key key-alt" data-key="AltLeft">
+    Alt
+</div>
+
+<div class="key key-space" data-key="Space">
+    Space
+</div>
+
+<div class="key key-alt" data-key="AltRight">
+    Alt
+</div>
+
+<div class="key key-win" data-key="MetaRight">
+    Win
+</div>
+
+<div class="key key-menu" data-key="ContextMenu">
+    Menu
+</div>
+
+<div class="key key-ctrl" data-key="ControlRight">
+    Ctrl
+</div>
+<div class="key key-arrow-up" data-key="ArrowUp">↑</div>
+
+</div>
+
+</div>
+
+<div class="keyboard-side">
+
+<div class="key-cluster navigation-cluster" aria-label="Navigation keys">
+<div class="key key-spacer" aria-hidden="true"></div>
+<div class="key key-spacer" aria-hidden="true"></div>
+<div class="key key-spacer" aria-hidden="true"></div>
+<div class="key" data-key="ArrowLeft">←</div>
+<div class="key" data-key="ArrowDown">↓</div>
+<div class="key" data-key="ArrowRight">→</div>
+</div>
+
+<div class="key-cluster numpad-cluster" aria-label="Numeric keypad">
+<div class="key" data-key="NumLock">Num</div>
+<div class="key" data-key="NumpadDivide">/</div>
+<div class="key" data-key="NumpadMultiply">*</div>
+<div class="key" data-key="NumpadSubtract">-</div>
+<div class="key" data-key="Numpad7">7</div>
+<div class="key" data-key="Numpad8">8</div>
+<div class="key" data-key="Numpad9">9</div>
+<div class="key key-tall" data-key="NumpadAdd">+</div>
+<div class="key" data-key="Numpad4">4</div>
+<div class="key" data-key="Numpad5">5</div>
+<div class="key" data-key="Numpad6">6</div>
+<div class="key" data-key="Numpad1">1</div>
+<div class="key" data-key="Numpad2">2</div>
+<div class="key" data-key="Numpad3">3</div>
+<div class="key key-tall" data-key="NumpadEnter">Enter</div>
+<div class="key key-double" data-key="Numpad0">0</div>
+<div class="key" data-key="NumpadDecimal">.</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+<div class="keyboard-info">
+
+<div class="status-copy">
+    <div class="status-line">
+        <strong>Last key pressed</strong>
+        <span id="lastKey">None</span>
+    </div>
+    <div id="heldKeys" aria-live="polite">No keys currently held</div>
+</div>
+
+<div class="status-actions">
+    <span id="testedCount">0 keys tested</span>
+    <button id="resetTester" type="button">Reset test</button>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<script>
+
+/* =========================
+   KEYBOARD TESTER
+========================= */
+
+const keys = [...document.querySelectorAll(".key[data-key]")];
+const lastKey = document.getElementById("lastKey");
+const heldKeysDisplay = document.getElementById("heldKeys");
+const testedCountDisplay = document.getElementById("testedCount");
+const resetButton = document.getElementById("resetTester");
+const keysByCode = new Map(keys.map(function(key) {
+    key.tabIndex = 0;
+    key.setAttribute("role", "button");
+    key.setAttribute("aria-label", key.textContent.trim());
+    return [key.dataset.key, key];
+}));
+const heldKeys = new Set();
+const testedKeys = new Set();
+let keyboardContextMenuDeadline = 0;
+
+function getVisualKey(code) {
+    return keysByCode.get(code);
+}
+
+function updateTestedCount() {
+    testedCountDisplay.textContent =
+        `${testedKeys.size} / ${keys.length} keys tested`;
+}
+
+function updateHeldKeys() {
+    if (heldKeys.size === 0) {
+        heldKeysDisplay.textContent = "No keys currently held";
+        return;
+    }
+
+    const readableKeys = [...heldKeys].map(function(code) {
+        return getVisualKey(code).textContent.trim();
+    });
+
+    heldKeysDisplay.textContent = "Held: " + readableKeys.join(" + ");
+}
+
+window.addEventListener("keydown", function(event) {
+    if (["PrintScreen", "NumLock", "PageUp", "PageDown", "MetaLeft", "MetaRight"].includes(event.code)) {
+        event.preventDefault();
+    }
+}, true);
+
+document.addEventListener("keydown", function(event) {
+    if (event.code === "ContextMenu") {
+        keyboardContextMenuDeadline = Date.now() + 500;
+        event.preventDefault();
+    }
+
+    const key = getVisualKey(event.code);
+    if (!key) return;
+
+    if (event.target === resetButton && (event.code === "Enter" || event.code === "Space")) return;
+    if (event.code !== "Tab") event.preventDefault();
+    if (event.repeat) return;
+
+    key.classList.add("active");
+    key.classList.add("tested");
+    key.setAttribute("aria-pressed", "true");
+    heldKeys.add(event.code);
+    testedKeys.add(event.code);
+    lastKey.textContent = key.textContent.trim();
+    updateHeldKeys();
+    updateTestedCount();
+});
+
+document.addEventListener("keyup", function(event) {
+    const key = getVisualKey(event.code);
+    if (!key) return;
+
+    key.classList.remove("active");
+    key.setAttribute("aria-pressed", "false");
+    heldKeys.delete(event.code);
+    updateHeldKeys();
+});
+
+document.addEventListener("contextmenu", function(event) {
+    if (Date.now() <= keyboardContextMenuDeadline) {
+        event.preventDefault();
+        keyboardContextMenuDeadline = 0;
+    }
+});
+
+function clearHeldKeys() {
+    heldKeys.forEach(function(code) {
+        const key = getVisualKey(code);
+        if (key) {
+            key.classList.remove("active");
+            key.setAttribute("aria-pressed", "false");
+        }
+    });
+    heldKeys.clear();
+    updateHeldKeys();
+}
+
+window.addEventListener("blur", clearHeldKeys);
+document.addEventListener("visibilitychange", function() {
+    if (document.hidden) clearHeldKeys();
+});
+
+keys.forEach(function(key) {
+    key.setAttribute("aria-pressed", "false");
+
+    key.addEventListener("pointerdown", function(event) {
+        key.classList.add("clicked");
+        lastKey.textContent = key.textContent.trim();
+        if (key.setPointerCapture) key.setPointerCapture(event.pointerId);
+    });
+
+    function releasePointer() {
+        key.classList.remove("clicked");
+    }
+
+    key.addEventListener("pointerup", releasePointer);
+    key.addEventListener("pointercancel", releasePointer);
+    key.addEventListener("lostpointercapture", releasePointer);
+});
+
+resetButton.addEventListener("click", function() {
+    clearHeldKeys();
+    testedKeys.clear();
+    keys.forEach(function(key) {
+        key.classList.remove("clicked");
+        key.classList.remove("tested");
+    });
+    lastKey.textContent = "None";
+    updateTestedCount();
+});
+
+updateTestedCount();
+
+</script>
+
+</body>
+</html>
